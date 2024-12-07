@@ -165,6 +165,8 @@ where
 {
     println!("OID is {}", D::OID);
     let oid = D::OID.as_bytes();
+    println!("OID as bytes {:x?}", oid);
+
     let oid_len = oid.len() as u8;
     let digest_len = <D as Digest>::output_size() as u8;
     let mut v = vec![
@@ -177,6 +179,7 @@ where
     ];
     v.extend_from_slice(oid);
     v.extend_from_slice(&[0x05, 0x00, 0x04, digest_len]);
+    println!("{:x?}", v);
     v
 }
 
