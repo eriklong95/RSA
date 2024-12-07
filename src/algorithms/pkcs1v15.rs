@@ -163,6 +163,7 @@ pub(crate) fn pkcs1v15_generate_prefix<D>() -> Vec<u8>
 where
     D: Digest + AssociatedOid,
 {
+    println!("OID is {}", D::OID);
     let oid = D::OID.as_bytes();
     let oid_len = oid.len() as u8;
     let digest_len = <D as Digest>::output_size() as u8;
