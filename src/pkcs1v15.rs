@@ -194,6 +194,8 @@ fn sign<R: CryptoRngCore + ?Sized>(
 ) -> Result<Vec<u8>> {
     let em = pkcs1v15_sign_pad(prefix, hashed, priv_key.size())?;
 
+    println!("em = {:x?}", em);
+
     uint_to_zeroizing_be_pad(
         rsa_decrypt_and_check(priv_key, rng, &BigUint::from_bytes_be(&em))?,
         priv_key.size(),
@@ -263,11 +265,6 @@ pub use oid::RsaSignatureAssociatedOid;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ::signature::{
-        hazmat::{PrehashSigner, PrehashVerifier},
-        DigestSigner, DigestVerifier, Keypair, RandomizedDigestSigner, RandomizedSigner,
-        SignatureEncoding, Signer, Verifier,
-    };
     use base64ct::{Base64, Encoding};
     use hex_literal::hex;
     use num_bigint::BigUint;
@@ -280,6 +277,11 @@ mod tests {
     use sha1::{Digest, Sha1};
     use sha2::Sha256;
     use sha3::Sha3_256;
+    use signature::{
+        hazmat::{PrehashSigner, PrehashVerifier},
+        DigestSigner, DigestVerifier, Keypair, RandomizedDigestSigner, RandomizedSigner,
+        SignatureEncoding, Signer, Verifier,
+    };
 
     use crate::traits::{
         Decryptor, EncryptingKeypair, PublicKeyParts, RandomizedDecryptor, RandomizedEncryptor,
