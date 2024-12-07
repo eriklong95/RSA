@@ -60,56 +60,56 @@ pub fn rsa_decrypt<R: CryptoRngCore + ?Sized>(
     let crt_values = priv_key.crt_values();
 
     let m = match (dp, dq, qinv, crt_values) {
-        (Some(dp), Some(dq), Some(qinv), Some(crt_values)) => {
-            // We have the precalculated values needed for the CRT.
+        // (Some(dp), Some(dq), Some(qinv), Some(crt_values)) => {
+        //     // We have the precalculated values needed for the CRT.
 
-            let p = &priv_key.primes()[0];
-            let q = &priv_key.primes()[1];
+        //     let p = &priv_key.primes()[0];
+        //     let q = &priv_key.primes()[1];
 
-            let mut m = c.modpow(dp, p).into_bigint().unwrap();
-            let mut m2 = c.modpow(dq, q).into_bigint().unwrap();
+        //     let mut m = c.modpow(dp, p).into_bigint().unwrap();
+        //     let mut m2 = c.modpow(dq, q).into_bigint().unwrap();
 
-            m -= &m2;
+        //     m -= &m2;
 
-            let mut primes: Vec<_> = priv_key
-                .primes()
-                .iter()
-                .map(ToBigInt::to_bigint)
-                .map(Option::unwrap)
-                .collect();
+        //     let mut primes: Vec<_> = priv_key
+        //         .primes()
+        //         .iter()
+        //         .map(ToBigInt::to_bigint)
+        //         .map(Option::unwrap)
+        //         .collect();
 
-            while m.is_negative() {
-                m += &primes[0];
-            }
-            m *= qinv;
-            m %= &primes[0];
-            m *= &primes[1];
-            m += &m2;
+        //     while m.is_negative() {
+        //         m += &primes[0];
+        //     }
+        //     m *= qinv;
+        //     m %= &primes[0];
+        //     m *= &primes[1];
+        //     m += &m2;
 
-            let mut c = c.into_owned().into_bigint().unwrap();
-            for (i, value) in crt_values.iter().enumerate() {
-                let prime = &primes[2 + i];
-                m2 = c.modpow(&value.exp, prime);
-                m2 -= &m;
-                m2 *= &value.coeff;
-                m2 %= prime;
-                while m2.is_negative() {
-                    m2 += prime;
-                }
-                m2 *= &value.r;
-                m += &m2;
-            }
+        //     let mut c = c.into_owned().into_bigint().unwrap();
+        //     for (i, value) in crt_values.iter().enumerate() {
+        //         let prime = &primes[2 + i];
+        //         m2 = c.modpow(&value.exp, prime);
+        //         m2 -= &m;
+        //         m2 *= &value.coeff;
+        //         m2 %= prime;
+        //         while m2.is_negative() {
+        //             m2 += prime;
+        //         }
+        //         m2 *= &value.r;
+        //         m += &m2;
+        //     }
 
-            // clear tmp values
-            for prime in primes.iter_mut() {
-                prime.zeroize();
-            }
-            primes.clear();
-            c.zeroize();
-            m2.zeroize();
+        //     // clear tmp values
+        //     for prime in primes.iter_mut() {
+        //         prime.zeroize();
+        //     }
+        //     primes.clear();
+        //     c.zeroize();
+        //     m2.zeroize();
 
-            m.into_biguint().expect("failed to decrypt")
-        }
+        //     m.into_biguint().expect("failed to decrypt")
+        // }
         _ => c.modpow(priv_key.d(), priv_key.n()),
     };
 
